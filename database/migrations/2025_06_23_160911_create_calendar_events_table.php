@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->string('description');
             $table->string('color_scheme');
-            $table->dateTime('date');
+            $table->date('date');
             $table->timestamps();
         });
     }
