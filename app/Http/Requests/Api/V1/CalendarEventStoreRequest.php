@@ -23,6 +23,7 @@ class CalendarEventStoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'amount' => ['nullable'],
             'description' => ['required', 'string', 'max:255'],
             'color_scheme' => ['string', 'max:255'],
             'date' => ['required'],

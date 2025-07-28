@@ -20,6 +20,7 @@ class CalendarEventFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'amount' => fake()->randomNumber(),
             'description' => fake()->paragraph(),
             'color_scheme' => 'red',
             'date' => fake()->date(),

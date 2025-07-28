@@ -39,4 +39,13 @@ class CalendarEvent extends Model
     protected $guarded = [
 
     ];
+
+    protected $casts = [
+    'amount' => 'decimal:2',
+    ];
+
+    public function categories()
+{
+    return $this->belongsToMany(CalendarCategory::class);
+}
 }

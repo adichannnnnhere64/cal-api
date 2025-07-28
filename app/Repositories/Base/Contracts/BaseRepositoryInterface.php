@@ -49,6 +49,11 @@ interface BaseRepositoryInterface
     public function delete(int $id): bool;
 
     /**
+     * Delete resource
+     */
+    public function deleteMany(array $ids): int;
+
+    /**
      * Get model instance
      */
     public function getModel(): Model;

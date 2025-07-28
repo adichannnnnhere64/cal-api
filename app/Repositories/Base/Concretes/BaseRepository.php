@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 abstract class BaseRepository implements BaseRepositoryInterface
@@ -102,7 +103,8 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function update(int $id, array $data): Model
     {
         $model = $this->findOrFail($id);
-        $model->update($data);
+        $model->fill($data);
+        $model->save();
 
         return $model->fresh();
     }
@@ -113,6 +115,19 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function delete(int $id): bool
     {
         return $this->findOrFail($id)->delete();
+    }
+
+    public function deleteMany(array $ids): int
+    {
+        $ids = array_filter(Arr::flatten($ids)); 
+        if (empty($ids)) {
+            return 0;
+        }
+
+        return $this->model
+            ->newQuery()
+            ->whereIn($this->model->getKeyName(), $ids)
+            ->delete();
     }
 
     /**

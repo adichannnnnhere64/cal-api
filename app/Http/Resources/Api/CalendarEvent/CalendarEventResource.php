@@ -20,8 +20,18 @@ class CalendarEventResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'eventname' => $this->name,
             'name' => $this->name,
-            'color_scheme' => $this->color_scheme,
+            'colorScheme' => $this->color_scheme,
+            'description' => $this->description,
+            'amount' => $this->amount,
+            'startdate' => $this->date,
+            'starttime' => '00:00',
+
+            'enddate' => $this->date,
+            'endtime' => '00:00',
+            'categories' => $this->categories()->pluck('id'),
+            'categories_object' => $this->categories()->get()
         ];
     }
 }

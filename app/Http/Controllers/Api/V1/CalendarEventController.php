@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\Api\V1\BulkSyncRequest;
 use App\Http\Requests\Api\V1\CalendarEventStoreRequest;
 use App\Http\Requests\Api\V1\CalendarEventUpdateRequest;
 use App\Http\Resources\Api\CalendarEvent\CalendarEventResource;
 use App\Services\Contracts\CalendarEventServiceInterface;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CalendarEventController extends BaseApiController
 {
@@ -87,4 +90,32 @@ class CalendarEventController extends BaseApiController
 
     //     return $this->successResponse(CalendarEventResource::collection($calendarEvents));
     // }
+    public function totalAmount(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'start_date' => 'string|required',
+            'end_date' => 'string|required',
+        ]);
+
+        $startDate = Carbon::parse($data['start_date']);
+        $endDate = Carbon::parse($data['end_date']);
+
+        $total = $this->calendarEventService->getTotalAmount($startDate, $endDate);
+
+        return $this->successResponse([
+            'total_amount' => $total
+        ]);
+    }
+
+    public function bulkSync(BulkSyncRequest $request): JsonResponse
+    {
+        $result = $this->calendarEventService->bulkSync($request->validated());
+
+        return response()->json([
+        'status'  => 'ok',
+            'data'    => $result,
+        ])->header('Access-Control-Allow-Origin', '*');
+
+    }
+
 }

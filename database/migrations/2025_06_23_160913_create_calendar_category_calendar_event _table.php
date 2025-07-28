@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('calendar_categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->foreignId('user_id');
-            $table->string('color_scheme');
-            $table->timestamps();
+        
+        Schema::create('calendar_category_calendar_event', function (Blueprint $table) {
+            $table->foreignId('calendar_category_id');
+            $table->foreignId('calendar_event_id');
         });
     }
 
@@ -25,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('calendar_categories', function (Blueprint $table) {
+        Schema::table('calendar_category_calendar_event', function (Blueprint $table) {
         });
     }
 };

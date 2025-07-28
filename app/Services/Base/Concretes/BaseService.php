@@ -41,7 +41,7 @@ abstract class BaseService implements BaseServiceInterface
     /**
      * Get paginated resources
      */
-    public function paginate(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator
+    public function paginate(int $perPage = 20000, array $columns = ['*']): LengthAwarePaginator
     {
         return $this->repository->paginate($perPage, $columns);
     }

@@ -21,7 +21,7 @@ interface QueryableRepositoryInterface extends BaseRepositoryInterface
     /**
      * Get paginated, filtered, sorted, and included resources.
      */
-    public function paginateFiltered(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator;
+    public function paginateFiltered(int $perPage = 20000, array $columns = ['*']): LengthAwarePaginator;
 
     /**
      * Get allowed filters for this repository.

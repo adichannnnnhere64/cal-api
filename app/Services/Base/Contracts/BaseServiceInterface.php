@@ -18,7 +18,7 @@ interface BaseServiceInterface
     /**
      * Get paginated resources
      */
-    public function paginate(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator;
+    public function paginate(int $perPage = 20000, array $columns = ['*']): LengthAwarePaginator;
 
     /**
      * Find resource by id

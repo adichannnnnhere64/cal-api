@@ -39,6 +39,12 @@ class CalendarEventRepository extends QueryableRepository implements ContractsCa
             AllowedFilter::exact('id'),
             'name',
             'email',
+            AllowedFilter::callback('categories', function ($query, $value) {
+                $query->whereHas('categories', function ($q) use ($value) {
+                    $q->whereIn('calendar_categories.id', (array) $value);
+                });
+            }),
+
         ];
     }
 
@@ -57,7 +63,7 @@ class CalendarEventRepository extends QueryableRepository implements ContractsCa
     {
         // Add any relationships you want to allow including
         // For example: 'posts', 'comments', etc.
-        return [];
+        return ['categories'];
     }
 
     /**

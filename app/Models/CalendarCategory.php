@@ -37,4 +37,10 @@ class CalendarCategory extends Model
     protected $guarded = [
 
     ];
+
+    public function events()
+    {
+        return $this->belongsToMany(CalendarEvent::class);
+    }
+
 }

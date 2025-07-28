@@ -40,7 +40,7 @@ class CalendarCategoryService extends BaseService implements CalendarCategorySer
     /**
      * Get filtered users with pagination
      */
-    public function getFilteredCalendarCategories(?Request $request = null, int $perPage = 15): LengthAwarePaginator
+    public function getFilteredCalendarCategories(?Request $request = null, int $perPage = 20000): LengthAwarePaginator
     {
         return $this->repository->paginateFiltered($perPage);
     }

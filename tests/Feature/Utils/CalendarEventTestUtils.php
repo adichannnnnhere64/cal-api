@@ -11,7 +11,7 @@ class CalendarEventTestUtils
         return [
             'id',
             'name',
-            'color_scheme',
+            'colorScheme',
         ];
     }
 
@@ -20,7 +20,7 @@ class CalendarEventTestUtils
         return [
             'id' => $calendarEvent['id'],
             'name' => $calendarEvent['name'],
-            'color_scheme' => $calendarEvent['color_scheme'],
+            'colorScheme' => @$calendarEvent['color_scheme'] ?? @$calendarEvent['colorScheme'],
         ];
     }
 }
