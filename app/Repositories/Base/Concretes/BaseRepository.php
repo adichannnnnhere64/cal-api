@@ -123,10 +123,12 @@ abstract class BaseRepository implements BaseRepositoryInterface
         if (empty($ids)) {
             return 0;
         }
-
+        
+        $keyName = $this->model->getModel()->getKeyName();
+        
         return $this->model
             ->newQuery()
-            ->whereIn($this->model->getKeyName(), $ids)
+            ->whereIn($keyName, $ids)
             ->delete();
     }
 
