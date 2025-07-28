@@ -11,6 +11,7 @@ use App\Services\Contracts\CalendarEventServiceInterface;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CalendarEventController extends BaseApiController
 {
@@ -26,7 +27,7 @@ class CalendarEventController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $events = $this->calendarEventService->getFilteredCalendarEvents(request());
+        $events = $this->calendarEventService->getFilteredCalendarEvents(request())->where('user_id', Auth::user()->id);
 
         return $this->successResponse(CalendarEventResource::collection($events));
     }

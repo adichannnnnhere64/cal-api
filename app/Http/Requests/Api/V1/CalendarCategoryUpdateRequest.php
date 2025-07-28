@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class CalendarCategoryUpdateRequest extends FormRequest
@@ -10,9 +11,19 @@ class CalendarCategoryUpdateRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+
+  public function authorize(): bool
     {
-        return true;
+        return Auth::check(); 
+    }
+
+    protected function prepareForValidation()
+    {
+        $userId = Auth::id();
+        
+        $this->merge([
+            'user_id' => $userId
+        ]);
     }
 
     /**

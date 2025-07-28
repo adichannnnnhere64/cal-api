@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CalendarCategoryStoreRequest extends FormRequest
 {
@@ -11,7 +12,16 @@ class CalendarCategoryStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::check(); 
+    }
+
+    protected function prepareForValidation()
+    {
+        $userId = Auth::id();
+        
+        $this->merge([
+            'user_id' => $userId
+        ]);
     }
 
     /**
@@ -22,6 +32,7 @@ class CalendarCategoryStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id' => ['required'],
             'name' => ['required', 'string', 'max:255'],
             'color_scheme' => ['string', 'max:255'],
         ];

@@ -8,6 +8,7 @@ use App\Http\Requests\Api\V1\CalendarCategoryUpdateRequest;
 use App\Http\Resources\Api\CalendarCategory\CalendarCategoryResource;
 use App\Services\Contracts\CalendarCategoryServiceInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class CalendarCategoryController extends BaseApiController
 {
@@ -23,7 +24,7 @@ class CalendarCategoryController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $events = $this->calendarEventService->getFilteredCalendarCategories(request());
+        $events = $this->calendarEventService->getFilteredCalendarCategories(request())->where('user_id', Auth::user()->id);
 
         return $this->successResponse(CalendarCategoryResource::collection($events));
     }
