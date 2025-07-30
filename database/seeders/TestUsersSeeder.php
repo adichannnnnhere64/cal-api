@@ -17,14 +17,14 @@ class TestUsersSeeder extends Seeder
         $users = [
             [
                 'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => Hash::make('password'),
+                'email' => 'mobistyle35@gmail.com',
+                'password' => Hash::make('Asakaboi35'),
                 'created_at' => now()->subMonths(3),
             ],
             [
-                'name' => 'Jane Smith',
-                'email' => 'jane@example.com',
-                'password' => Hash::make('password'),
+                'name' => 'Olaf Guerrero',
+                'email' => 'olaf@kewlor.com',
+                'password' => Hash::make('JodHRwczovL3B'),
                 'created_at' => now()->subMonths(2),
             ],
             [

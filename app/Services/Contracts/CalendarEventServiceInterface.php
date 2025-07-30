@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 interface CalendarEventServiceInterface extends BaseServiceInterface
@@ -28,4 +29,9 @@ interface CalendarEventServiceInterface extends BaseServiceInterface
     public function getTotalAmount(Carbon $startDate, Carbon $endDate): float;
 
     public function bulkSync(array $data): array;
+
+    public function duplicate(Carbon $sourceDate, ?Carbon $targetDate = null): \Illuminate\Support\Collection;
+
+    public function importFromCsv(UploadedFile $csv): \Illuminate\Support\Collection;
+
 }

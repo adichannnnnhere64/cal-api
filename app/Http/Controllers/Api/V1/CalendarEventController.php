@@ -119,4 +119,33 @@ class CalendarEventController extends BaseApiController
 
     }
 
+    public function duplicate(Request $request)
+    {
+        $request->validate([
+            'date'       => 'required|date',
+            'targetDate' => 'nullable|date',
+        ]);
+
+        $sourceDate = Carbon::parse($request->input('date'));
+        $targetDate = $request->filled('targetDate') ? Carbon::parse($request->input('targetDate')) : null;
+
+        $duplicates = $this->calendarEventService->duplicate($sourceDate, $targetDate);
+
+        return response()->json(['data' => $duplicates], 200);
+
+    }
+
+    public function importFromCsv(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:csv,txt'],
+        ]);
+
+        $imported = $this->calendarEventService->importFromCsv($request->file('file'));
+
+        return response()->json([
+            'message' => 'CSV imported successfully.',
+            'count'   => $imported->count(),
+        ]);
+    }
 }

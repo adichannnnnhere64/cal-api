@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -20,6 +21,7 @@ class CalendarEventFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'user_id' => 1,
             'amount' => fake()->randomNumber(),
             'description' => fake()->paragraph(),
             'color_scheme' => 'red',

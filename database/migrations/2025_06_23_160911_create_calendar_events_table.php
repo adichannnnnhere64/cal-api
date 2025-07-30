@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('amount', 12, 2)->nullable();
             $table->foreignId('user_id');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->string('color_scheme');
             $table->date('date');
             $table->timestamps();

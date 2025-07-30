@@ -21,6 +21,7 @@ class CalendarCategoryFactory extends Factory
         return [
             'name' => fake()->name(),
             'color_scheme' => 'red',
+            'user_id' => 1
         ];
     }
 }

@@ -3,6 +3,7 @@
 use App\Models\CalendarCategory;
 use App\Models\CalendarEvent;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Tests\Feature\Utils\CalendarEventTestUtils;
 
 it('returns calendar event without filters', function () {
@@ -22,7 +23,8 @@ it('returns calendar event without filters', function () {
 it('creates new calendar event', function () {
     $calendarEvent = CalendarEvent::factory()->make();
 
-    $response = authedUser()->postJson('/api/v1/calendar-events', $calendarEvent->toArray());
+
+    $response = authedUser()->postJson('/api/v1/calendar-events',  $calendarEvent->toArray() );
     $createdCalendarEvent = $response->original['data'];
 
     $response->assertCreated()
@@ -139,6 +141,7 @@ it('shows a calendar event by total amount', function () {
     $calendarEvent = CalendarEvent::factory()->create([
         'amount' => 69,
         'date'   => '2024-10-12',
+        'user_id' => 1
     ]);
 
     authedUser()
@@ -149,4 +152,106 @@ it('shows a calendar event by total amount', function () {
                 'total_amount' => 69,
             ],
         ]);
+});
+
+it('duplicates all events in a month into target month, adjusting invalid days', function () {
+    // Create two events in December
+    CalendarEvent::factory()->create([
+        'amount'  => 69,
+        'date'    => '2024-12-12',
+        'user_id' => 1,
+    ]);
+
+    CalendarEvent::factory()->create([
+        'amount'  => 42,
+        'date'    => '2024-12-31',
+        'user_id' => 1,
+    ]);
+
+    // This should not be duplicated
+    CalendarEvent::factory()->create([
+        'amount'  => 99,
+        'date'    => '2024-11-30',
+        'user_id' => 1,
+    ]);
+
+    // Case 1: with target date (February 2025)
+    authedUser()
+        ->postJson('/api/v1/calendar-events/duplicate', [
+            'date'       => '2024-12-01',
+            'targetDate' => '2025-02-01',
+        ])
+        ->assertStatus(200);
+
+        // dd(CalendarEvent::all()->pluck('date'));
+
+    $this->assertDatabaseHas('calendar_events', [
+        'date'    => '2025-02-12',
+        'amount'  => 69,
+        'user_id' => 1,
+    ]);
+
+    $this->assertDatabaseHas('calendar_events', [
+        'date'    => '2025-02-28', // Adjusted from Dec 31
+        'amount'  => 42,
+        'user_id' => 1,
+    ]);
+
+    $this->assertDatabaseMissing('calendar_events', [
+        'date'    => '2025-02-30',
+        'amount'  => 42,
+    ]);
+
+    // Case 2: no targetDate (should default to January)
+    CalendarEvent::factory()->create([
+        'amount'  => 100,
+        'date'    => '2024-12-15',
+        'user_id' => 1,
+    ]);
+
+    authedUser()
+        ->postJson('/api/v1/calendar-events/duplicate', [
+            'date' => '2024-12-01',
+        ])
+        ->assertStatus(200);
+
+    $this->assertDatabaseHas('calendar_events', [
+        'date'   => '2025-01-15',
+        'amount' => 100,
+    ]);
+});
+
+
+it('imports calendar events from a CSV file', function () {
+    Storage::fake('local');
+
+    $csvContent = <<<CSV
+name,amount,description,color_scheme,date
+Lunch,150.50,Lunch with clients,blue,2025-07-15
+Groceries,89.99,Weekly grocery run,green,2025-07-20
+Transport,20.00,Taxi fare,red,2025-07-21
+CSV;
+
+    $file = UploadedFile::fake()->createWithContent('events.csv', $csvContent);
+
+    $response = authedUser()->postJson('/api/v1/calendar-events/import', [
+        'file' => $file,
+    ]);
+
+    $response->assertStatus(200);
+
+    expect(CalendarEvent::count())->toBe(3);
+
+    $this->assertDatabaseHas('calendar_events', [
+        'name'         => 'Lunch',
+        'amount'       => 150.50,
+        'color_scheme' => 'blue',
+        'date'         => '2025-07-15',
+    ]);
+
+    $this->assertDatabaseHas('calendar_events', [
+        'name' => 'Groceries',
+        'amount' => 89.99,
+        'date' => '2025-07-20',
+    ]);
 });

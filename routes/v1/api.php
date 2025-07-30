@@ -40,11 +40,19 @@ Route::group(['middleware' => 'auth:api'], function () {
 });
 
 Route::group(['middleware' => 'auth:api'], function () {
+
+    Route::post('calendar-events/duplicate', [
+        CalendarEventController::class, 'duplicate'
+    ])->name('calendar-events.duplicate');
+
+    Route::post('/calendar-events/import', [CalendarEventController::class, 'importFromCsv']);
+
     Route::get('calendar-events/total-amount', [ CalendarEventController::class, 'totalAmount' ])->name('calendar-events.total-amount');
 
     Route::post('calendar-events/bulk-sync', [CalendarEventController::class, 'bulkSync'])->name('calendar-events.bulk-sync');
 
     Route::apiResource('calendar-events', CalendarEventController::class)->names('calendar-events');
+
 
 });
 

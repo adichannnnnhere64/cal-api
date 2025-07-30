@@ -2,6 +2,7 @@
 
 namespace App\Services\Concretes;
 
+use App\Http\Resources\Api\CalendarEvent\CalendarEventResource;
 use App\Models\CalendarEvent;
 use App\Repositories\CalendarEvent\Contracts\CalendarEventRepositoryInterface;
 use App\Services\Base\Concretes\BaseService;
@@ -11,9 +12,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use League\Csv\Exception;
+use League\Csv\Reader;
 
 class CalendarEventService extends BaseService implements CalendarEventServiceInterface
 {
@@ -172,6 +177,75 @@ class CalendarEventService extends BaseService implements CalendarEventServiceIn
     {
         if (method_exists($event, 'categories')) {
             $event->categories()->sync($categoryIds);
+        }
+    }
+
+    public function duplicate(Carbon $sourceDate, ?Carbon $targetDate = null): \Illuminate\Support\Collection
+    {
+        $targetDate ??= $sourceDate->copy()->addMonth();
+
+        $events = CalendarEvent::with('categories')
+            ->whereYear('date', $sourceDate->year)
+            ->whereMonth('date', $sourceDate->month)
+            ->get();
+
+        $duplicates = collect();
+
+        foreach ($events as $event) {
+            $originalDay = Carbon::parse($event->date)->day;
+
+            $safeDay = min(
+                $originalDay,
+                Carbon::create($targetDate->year, $targetDate->month)->endOfMonth()->day
+            );
+
+            $newDate = Carbon::create(
+                year: $targetDate->year,
+                month: $targetDate->month,
+                day: $safeDay
+            )->format('Y-m-d');
+
+            $duplicate = $event-> replicate();
+            $duplicate->date = $newDate;
+            $duplicate->created_at = now();
+            $duplicate->updated_at = now();
+            $duplicate->save();
+
+            $duplicates->push(CalendarEventResource::make($duplicate));
+        }
+
+        return $duplicates;
+    }
+
+
+    public function importFromCsv(UploadedFile $csv): \Illuminate\Support\Collection
+    {
+        try {
+            $reader = Reader::createFromPath($csv->getRealPath(), 'r');
+            $reader->setHeaderOffset(0); 
+
+            $records = collect();
+            foreach ($reader->getRecords() as $record) {
+                $record['user_id'] = Auth::user()->id;
+                $record['amount'] = is_numeric($record['amount']) ? (float) $record['amount'] : null;
+                $record['date'] = Carbon::parse($record['date'])->format('Y-m-d');
+
+                $event = CalendarEvent::create([
+                    'name'         => $record['name'],
+                    'amount'       => $record['amount'],
+                    'description'  => $record['description'],
+                    'color_scheme' => $record['color_scheme'],
+                    'date'         => $record['date'],
+                    'user_id'      => $record['user_id'],
+                ]);
+
+                $records->push($event);
+            }
+
+            return $records;
+        } catch (Exception $e) {
+            report($e);
+            throw new \RuntimeException('Invalid CSV file.');
         }
     }
 
