@@ -31,7 +31,9 @@ class CalendarEventResource extends JsonResource
             'enddate' => $this->date,
             'endtime' => '00:00',
             'categories' => $this->categories()->pluck('id'),
-            'categories_object' => $this->categories()->get()
+            'categories_object' => $this->categories()->get(),
+
+            'is_done' => $this->is_done,
         ];
     }
 }

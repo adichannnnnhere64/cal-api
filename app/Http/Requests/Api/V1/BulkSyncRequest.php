@@ -9,16 +9,16 @@ class BulkSyncRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check(); 
+        return Auth::check();
     }
 
     protected function prepareForValidation()
     {
         $userId = Auth::id();
-        
+
         $created = $this->input('created', []);
         $updated = $this->input('updated', []);
-        
+
         // Normalize created events
         $created = array_map(function ($item) use ($userId) {
             if (isset($item['eventname'])) {
@@ -31,13 +31,13 @@ class BulkSyncRequest extends FormRequest
             }
             // Ensure categories is always an array
             $item['categories'] = $item['categories'] ?? [];
-            
+
             // Add user_id to each created item
             $item['user_id'] = $userId;
-            
+
             return $item;
         }, $created);
-        
+
         // Normalize updated events
         $updated = array_map(function ($item) use ($userId) {
             if (isset($item['eventname'])) {
@@ -50,10 +50,10 @@ class BulkSyncRequest extends FormRequest
             }
             // Ensure categories is always an array
             $item['categories'] = $item['categories'] ?? [];
-            
+
             // Add user_id to each updated item
             $item['user_id'] = $userId;
-            
+
             return $item;
         }, $updated);
 
@@ -69,7 +69,7 @@ class BulkSyncRequest extends FormRequest
         return [
             // Global user_id validation
             'user_id' => ['required', 'integer', 'exists:users,id'],
-            
+
             // Created items validation
             'created' => ['array'],
             'created.*.user_id' => ['required', 'integer', 'exists:users,id'],
@@ -78,8 +78,9 @@ class BulkSyncRequest extends FormRequest
             'created.*.description' => ['nullable', 'string', 'max:255'],
             'created.*.color_scheme' => ['nullable', 'string', 'max:255'],
             'created.*.date' => ['required', 'date'],
+            'created.*.is_done' => ['boolean'],
             'created.*.categories' => ['array'],
-            
+
             // Updated items validation
             'updated' => ['array'],
             'updated.*.id' => ['required', 'integer'],
@@ -88,9 +89,10 @@ class BulkSyncRequest extends FormRequest
             'updated.*.amount' => ['nullable', 'numeric'],
             'updated.*.description' => ['nullable', 'string', 'max:255'],
             'updated.*.color_scheme' => ['nullable', 'string', 'max:255'],
+            'updated.*.is_done' => ['boolean'],
             'updated.*.date' => ['required', 'date'],
             'updated.*.categories' => ['array'],
-            
+
             // Deleted items validation
             'deleted' => ['array'],
             'deleted.*' => ['integer'],
@@ -104,14 +106,14 @@ class BulkSyncRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $userId = Auth::id();
-            
+
             $created = $this->input('created', []);
             foreach ($created as $index => $item) {
                 if (isset($item['user_id']) && $item['user_id'] != $userId) {
                     $validator->errors()->add("created.{$index}.user_id", 'You can only create items for yourself.');
                 }
             }
-            
+
             $updated = $this->input('updated', []);
             foreach ($updated as $index => $item) {
                 if (isset($item['user_id']) && $item['user_id'] != $userId) {

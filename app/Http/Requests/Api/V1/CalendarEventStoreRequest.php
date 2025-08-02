@@ -12,19 +12,19 @@ class CalendarEventStoreRequest extends FormRequest
      */
   public function authorize(): bool
     {
-        return Auth::check(); 
+        return Auth::check();
     }
 
     protected function prepareForValidation()
     {
         $userId = Auth::id();
-        
+
         $this->merge([
             'user_id' => $userId
         ]);
     }
 
- 
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -37,6 +37,7 @@ class CalendarEventStoreRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'user_id' => ['required'],
             'amount' => ['nullable'],
+            'is_done' => ['boolean'],
             'description' => ['required', 'string', 'max:255'],
             'color_scheme' => ['string', 'max:255'],
             'date' => ['required'],
