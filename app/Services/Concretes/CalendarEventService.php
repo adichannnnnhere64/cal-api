@@ -146,7 +146,7 @@ class CalendarEventService extends BaseService implements CalendarEventServiceIn
                 // \Log::info('ramon buratilya');
             // UPDATE
             foreach ($payload['updated'] ?? [] as $data) {
-                \Log::info($data);
+                /* \Log::info($data); */
                 $id = Arr::get($data, 'id');
 
                 if (!$id) {
