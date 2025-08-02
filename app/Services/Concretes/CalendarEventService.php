@@ -185,6 +185,7 @@ class CalendarEventService extends BaseService implements CalendarEventServiceIn
         $targetDate ??= $sourceDate->copy()->addMonth();
 
         $events = CalendarEvent::with('categories')
+            ->where('user_id', Auth::user()->id)
             ->whereYear('date', $sourceDate->year)
             ->whereMonth('date', $sourceDate->month)
             ->get();
@@ -222,7 +223,7 @@ class CalendarEventService extends BaseService implements CalendarEventServiceIn
     {
         try {
             $reader = Reader::createFromPath($csv->getRealPath(), 'r');
-            $reader->setHeaderOffset(0); 
+            $reader->setHeaderOffset(0);
 
             $records = collect();
             foreach ($reader->getRecords() as $record) {
