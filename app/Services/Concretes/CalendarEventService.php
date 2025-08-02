@@ -212,8 +212,11 @@ class CalendarEventService extends BaseService implements CalendarEventServiceIn
             $duplicate->updated_at = now();
             $duplicate->save();
 
-            // ✅ Copy categories relationship (many-to-many)
+            \Log::info($event->categories);
             $duplicate->categories()->sync($event->categories->pluck('id'));
+
+            \Log::info($duplicate->categories);
+
 
             $duplicates->push(CalendarEventResource::make($duplicate));
         }
