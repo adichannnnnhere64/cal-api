@@ -213,6 +213,7 @@ class CalendarEventService extends BaseService implements CalendarEventServiceIn
             $duplicate->save();
 
             \Log::info($event->categories);
+            \Log::info('adi here');
             $duplicate->categories()->sync($event->categories->pluck('id'));
 
             \Log::info($duplicate->categories);
