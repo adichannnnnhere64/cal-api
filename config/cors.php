@@ -4,8 +4,8 @@ return [
     'paths' => ['api/*', 'login', 'register', 'logout'], // any endpoints you call cross-origin
     'allowed_methods' => ['*'],
     'allowed_origins' => [
-        'http://bugito.test',        // your frontend
-        'https://phplaravel-941620-5728130.cloudwaysapps.com',
+        'http://cal-web.test',        // your frontend
+        'https://calendar.kewlor.com',
         'http://127.0.0.1:8100',
         'http://localhost:8100',
         'http://localhost:3000',     // add your dev host if needed
