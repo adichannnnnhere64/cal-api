@@ -206,14 +206,18 @@ class CalendarEventService extends BaseService implements CalendarEventServiceIn
                 day: $safeDay
             )->format('Y-m-d');
 
-            $duplicate = $event-> replicate();
+            $duplicate = $event->replicate();
             $duplicate->date = $newDate;
             $duplicate->created_at = now();
             $duplicate->updated_at = now();
             $duplicate->save();
 
+            // ✅ Copy categories relationship (many-to-many)
+            $duplicate->categories()->sync($event->categories->pluck('id'));
+
             $duplicates->push(CalendarEventResource::make($duplicate));
         }
+
 
         return $duplicates;
     }
